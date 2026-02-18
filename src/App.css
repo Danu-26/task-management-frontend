@@ -1,1 +1,154 @@
+html,
+body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container-theme {
+    background-color: #001A00;
+}
+
+
+/*login form card*/
+.auth-form-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    border-radius: 16px;
+    background: #ffffff;
+    border: none;
+}
+
+.auth-title {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.login-btn {
+    background: linear-gradient(135deg, #ff6b35 0%, #0b3d0b 100%);
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+
+.login-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+.signup-link {
+    color: #001A00;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}
+
+
+/*landing left content*/
+.featuresList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.featureTitle,
+.featureDesc {
+    margin: 0;
+    padding: 0;
+}
+
+.featureItem {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.27);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: left;
+}
+
+.featureIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.featureIcon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.featureTitle {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: white;
+}
+
+.featureDesc {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.form-control:focus {
+    border: none;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.43) !important;
+}
+
+
+@media (max-width: 767px) {
+    .container-top {
+        padding-top: 20px;
+    }
+
+    .features-column {
+        padding-top: 2rem;
+    }
+
+    .auth-form-wrapper {
+        display: block;
+        min-height: auto;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .auth-column {
+        height: auto !important;
+        overflow-y: visible !important;
+        min-height: auto;
+    }
+}
