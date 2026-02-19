@@ -6,8 +6,25 @@ export const addTaskApi = async (data) => {
         const response = await axiosInstance.post('/task/create-task', data);
         return response.data;
     } catch (error) {
-        throw error.response?.data?.message || 'Adding task failed. Please try again.';
+        throw error.response?.data?.message || 'Adding task failed.';
     }
 }
 
 
+export const getTasksApi = async (data) => {
+    try {
+        const response = await axiosInstance.post('/task/get-all-task', data);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Getting task failed.';
+    }
+}
+
+export const getStatsApi = async () => {
+    try {
+        const response = await axiosInstance.get('/task/get-task-stats');
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Getting task stats failed.';
+    }
+}
