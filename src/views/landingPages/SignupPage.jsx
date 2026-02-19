@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signupApi } from '../../services/authService.js';
 import { toast } from 'react-toastify';
 
-const SignupPage = ({ setUser }) => {
+const SignupPage = ({setUser}) => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -68,11 +68,12 @@ const SignupPage = ({ setUser }) => {
             toast.success('Account created successfully!');
 
             // Set user & token
-            setUser(response.user);
+            setUser(response.data.user);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             localStorage.setItem('token', response.token);
 
             // Redirect to dashboard
-            navigate('/dashboard');
+            navigate('/login');
         } catch (error) {
             // Show error toast
             toast.error(error);

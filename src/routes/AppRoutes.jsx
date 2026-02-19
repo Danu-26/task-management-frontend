@@ -6,7 +6,7 @@ import SignupPage from '../views/landingPages/SignupPage.jsx';
 import Dashboard from '../views/DashboardPage.jsx';
 import ProtectedRoute from '../components/ProtectedRoute.jsx';
 
-const AppRoutes = ({ user, setUser }) => {
+const AppRoutes = ({ user ,setUser}) => {
     return (
         <Routes>
             {/* Auth Layout Wrapper */}
@@ -14,13 +14,13 @@ const AppRoutes = ({ user, setUser }) => {
                 <Route
                     path="/login"
                     element={
-                        user ? <Navigate to="/dashboard" replace /> : <LoginPage setUser={setUser} />
+                        user ? <Navigate to="/dashboard" replace /> : <LoginPage setUser={setUser}/>
                     }
                 />
                 <Route
                     path="/signup"
                     element={
-                        user ? <Navigate to="/dashboard" replace /> : <SignupPage setUser={setUser} />
+                        user ? <Navigate to="/dashboard" replace /> : <SignupPage setUser={setUser}/>
                     }
                 />
             </Route>
@@ -33,7 +33,7 @@ const AppRoutes = ({ user, setUser }) => {
                 path="/dashboard"
                 element={
                     <ProtectedRoute user={user}>
-                        <Dashboard />
+                        <Dashboard  user={user}  setUser={setUser}/>
                     </ProtectedRoute>
                 }
             />
