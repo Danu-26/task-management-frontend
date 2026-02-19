@@ -262,7 +262,7 @@ const DashboardPage = ({ user, setUser }) => {
             </div>
 
             {/* Stats */}
-            <div className="row mb-4 mt-5">
+            <div className="row mb-4 mt-5 stats-card">
                 <div className="col-md-2"><StatCard label="Total Tasks" value={stats.total} /></div>
                 <div className="col-md-2"><StatCard label="To Do" value={stats.todo} /></div>
                 <div className="col-md-2"><StatCard label="In Progress" value={stats.inProgress} /></div>

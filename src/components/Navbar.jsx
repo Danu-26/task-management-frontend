@@ -13,7 +13,7 @@ const Navbar = ({ userName, onLogout }) => {
             <div className="container-fluid">
 
                 {/* Brand */}
-                <div className="navbar-brand d-flex align-items-center gap-2">
+                <div className="navbar-brand d-flex align-items-center gap-2  d-none d-md-flex">
                     <div className="logo-theme">
                         <SiTask size={32}/>
                     </div>
@@ -21,14 +21,14 @@ const Navbar = ({ userName, onLogout }) => {
                 </div>
 
                 {/* User Section */}
-                <div className="d-flex align-items-center gap-3 position-relative">
+                <div className="d-flex align-items-center gap-3 position-relative  ms-auto">
 
                     <div className="text-end">
                         <div className="fw-semibold text-theme-green">
                             {userName}
                         </div>
                         <div className="text-muted small">
-                            Task Manager
+                            WELCOME
                         </div>
                     </div>
 
