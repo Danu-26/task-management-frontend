@@ -6,6 +6,8 @@ import {useNavigate} from "react-router-dom";
 import TaskModal from "../components/TaskModal.jsx";
 import { ImFileEmpty } from "react-icons/im";
 import SearchTask from "../components/SearchTask.jsx";
+import {addTaskApi} from "../services/taskService.js";
+import { toast } from 'react-toastify';
 
 const DashboardPage = ({user,setUser}) => {
     const navigate = useNavigate();
@@ -91,22 +93,57 @@ const DashboardPage = ({user,setUser}) => {
     };
 
     //Handle Add a new task
-    const handleAddTask = () => {
-        if (!newTask.title.trim()) {
-            alert('Please enter a task title');
-            return;
+    const handleAddTask = async () => {
+        try {
+            //Title Validation
+            if (!newTask.title.trim()) {
+                toast.error('Please enter a task title');
+                return;
+            }
+           //console.log(user.id)
+            const payload = {
+                title: newTask.title,
+                description: newTask.description,
+                status: newTask.status,
+                priority: newTask.priority,
+                user_id: user.id
+            };
+
+            const response = await addTaskApi(payload);
+
+            if (response?.success) {
+                const createdTask = response.data;
+
+                // Update state
+                setTasks((prev) => [...prev, createdTask]);
+
+                // Reset form
+                setNewTask({
+                    title: '',
+                    description: '',
+                    priority: 'MEDIUM',
+                    status: 'TODO'
+                });
+
+                setShowModal(false);
+
+                // Success toast
+                toast.success('Task created successfully');
+            } else {
+                toast.error(response?.message || 'Failed to create task');
+            }
+        } catch (error) {
+            console.error('Add Task Error:', error);
+
+            const message =
+                error?.response?.data?.message ||
+                error.message ||
+                'Something went wrong while creating task';
+
+            toast.error(message);
         }
-        const task = {
-            id: Date.now(),
-            title: newTask.title,
-            description: newTask.description,
-            status: newTask.status,
-            priority: newTask.priority,
-        };
-        setTasks([...tasks, task]);
-        setNewTask({ title: '', description: '', priority: 'MEDIUM', status: 'TODO' });
-        setShowModal(false);
     };
+
 
 
     return (

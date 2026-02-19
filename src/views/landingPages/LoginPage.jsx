@@ -71,8 +71,8 @@ const LoginPage = ({setUser}) => {
 
             // After successful login
             setUser(response.data.user);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.data?.user));
+            localStorage.setItem('token', response.data?.token);
             navigate('/dashboard');
 
         } catch (error) {

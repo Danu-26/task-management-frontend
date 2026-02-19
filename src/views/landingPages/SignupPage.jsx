@@ -69,8 +69,8 @@ const SignupPage = ({setUser}) => {
 
             // Set user & token
             setUser(response.data.user);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.data?.user));
+            localStorage.setItem('token', response.data?.token);
 
             // Redirect to dashboard
             navigate('/login');
