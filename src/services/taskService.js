@@ -28,3 +28,12 @@ export const getStatsApi = async () => {
         throw error.response?.data?.message || 'Getting task stats failed.';
     }
 }
+
+export const taskDeleteApi = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/task/remove-task/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Getting task stats failed.';
+    }
+}

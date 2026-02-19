@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import TaskModal from "../components/TaskModal.jsx";
 import { ImFileEmpty } from "react-icons/im";
 import SearchTask from "../components/SearchTask.jsx";
-import { addTaskApi, getTasksApi, getStatsApi } from "../services/taskService.js";
+import { addTaskApi, getTasksApi, getStatsApi ,taskDeleteApi} from "../services/taskService.js";
 import { toast } from 'react-toastify';
 
 const DashboardPage = ({ user, setUser }) => {
@@ -97,12 +97,28 @@ const DashboardPage = ({ user, setUser }) => {
         navigate('/login');
     };
 
-    // Task handlers
-    const handleDeleteTask = (id) => {
-        setTasks(prev => prev.filter(t => t.id !== id));
-        fetchStats(); // update stats
-    };
+    // Handle task delete
+    const handleDeleteTask = async (id) => {
+        try {
+            // API Call
+            const response = await taskDeleteApi(id);
 
+            if (response?.success) {
+                // Update tasks
+                setTasks(prev => prev.filter(t => t.id !== id));
+
+                // Update stats
+                fetchStats();
+
+                toast.success('Task deleted successfully');
+            } else {
+                toast.error(response?.message || 'Failed to delete task');
+            }
+        } catch (error) {
+            console.error('Delete Task Error:', error);
+            toast.error(error || 'Something went wrong while deleting the task');
+        }
+    };
     const handleEditClick = (task) => {
         setNewTask(task);
         setEditTaskId(task.id);
