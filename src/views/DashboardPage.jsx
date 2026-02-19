@@ -1,74 +1,108 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
 import StatCard from '../components/StatiticCard.jsx';
 import TaskCard from '../components/TaskCard.jsx';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TaskModal from "../components/TaskModal.jsx";
 import { ImFileEmpty } from "react-icons/im";
 import SearchTask from "../components/SearchTask.jsx";
-import {addTaskApi} from "../services/taskService.js";
+import { addTaskApi, getTasksApi, getStatsApi } from "../services/taskService.js";
 import { toast } from 'react-toastify';
 
-const DashboardPage = ({user,setUser}) => {
+const DashboardPage = ({ user, setUser }) => {
     const navigate = useNavigate();
-    const [showModal, setShowModal] = useState(false);
+
+    // Task and filter states
+    const [tasks, setTasks] = useState([]);
+    const [page, setPage] = useState(1);
+    const [limit] = useState(5);
+    const [totalPages, setTotalPages] = useState(1);
     const [activeTab, setActiveTab] = useState('all');
-    const [newTask, setNewTask] = useState({
-        title: '',
-        description: '',
-        priority: 'MEDIUM',
-        status: 'TODO'
-    });
+    const [priorityFilter, setPriorityFilter] = useState('ALL');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Modal states
+    const [showModal, setShowModal] = useState(false);
+    const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'MEDIUM', status: 'TODO' });
     const [editTaskId, setEditTaskId] = useState(null);
     const [modalMode, setModalMode] = useState("create");
-    const [searchTerm, setSearchTerm] = useState('');
-    const [priorityFilter, setPriorityFilter] = useState('ALL');
-    const [tasks, setTasks] = useState([
-        { id: 1, title: 'Finish project report', description: 'Complete Q4', status: 'TODO', priority: 'HIGH' },
-        { id: 2, title: 'Review team feedback', description: '', status: 'IN_PROGRESS', priority: 'MEDIUM' },
-        { id: 3, title: 'Setup meeting with client', description: '', status: 'DONE', priority: 'LOW' },
-    ]);
 
-    const userName =user?.name;
+    // Stats
+    const [stats, setStats] = useState({
+        total: 0,
+        todo: 0,
+        inProgress: 0,
+        done: 0
+    });
 
-    //Dashboard statistic data
-    const stats = {
-        total: tasks.length,
-        todo: tasks.filter(t => t.status === 'TODO').length,
-        inProgress: tasks.filter(t => t.status === 'IN_PROGRESS').length,
-        done: tasks.filter(t => t.status === 'DONE').length,
-    };
     const completionRate = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
 
-    //Logout Call
+    // Fetch stats
+    const fetchStats = async () => {
+        try {
+            const response = await getStatsApi();
+            if (response?.success) {
+                setStats(response.data);
+            } else {
+                toast.error(response?.message || 'Failed to fetch stats');
+            }
+        } catch (error) {
+            console.error('Stats fetch error:', error);
+            toast.error(error?.message || 'Failed to fetch stats');
+        }
+    };
+
+    // Fetch tasks with filters & pagination
+    const fetchTasks = async (pageNumber = 1) => {
+        try {
+            const payload = {
+                page: pageNumber,
+                limit,
+                status: activeTab === 'all' ? undefined : activeTab,
+                priority: priorityFilter === 'ALL' ? undefined : priorityFilter,
+                search: searchTerm?.trim() || undefined
+            };
+
+            const response = await getTasksApi(payload);
+
+            if (response?.success) {
+                setTasks(response.data);
+                setPage(response.page);
+                setTotalPages(Math.ceil(response.total / response.limit));
+            } else {
+                toast.error(response?.message || 'Failed to fetch tasks');
+            }
+        } catch (error) {
+            console.error('Fetch Tasks Error:', error);
+            toast.error(error?.response?.data?.message || error?.message || 'Failed to load tasks');
+        }
+    };
+
+    // Initial fetch on mount
+    useEffect(() => {
+        fetchStats();
+        fetchTasks(1);
+    }, []);
+
+    // Re-fetch tasks on filters change
+    useEffect(() => {
+        fetchTasks(1);
+    }, [activeTab, priorityFilter, searchTerm]);
+
+    // Logout
     const handleLogout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         setUser(null);
-
-        // Redirect to login page after logout
         navigate('/login');
-    }
+    };
 
-    //Based on search or tab filter tasks
-    const filteredTasks = tasks
-        .filter(task =>
-            activeTab === 'all' ? true : task.status === activeTab
-        )
-        .filter(task =>
-            priorityFilter === 'ALL' ? true : task.priority === priorityFilter
-        )
-        .filter(task =>
-            task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            task.description.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-    //Handle Delete
+    // Task handlers
     const handleDeleteTask = (id) => {
-        setTasks(tasks.filter(t => t.id !== id));
-    }
+        setTasks(prev => prev.filter(t => t.id !== id));
+        fetchStats(); // update stats
+    };
 
-    //Handle edit button click
     const handleEditClick = (task) => {
         setNewTask(task);
         setEditTaskId(task.id);
@@ -76,101 +110,119 @@ const DashboardPage = ({user,setUser}) => {
         setShowModal(true);
     };
 
-    //API call for update edited task
     const handleUpdateTask = () => {
-        setTasks(tasks.map(task =>
+        setTasks(prev => prev.map(task =>
             task.id === editTaskId ? { ...task, ...newTask } : task
         ));
         setShowModal(false);
         setEditTaskId(null);
         setModalMode("create");
-        setNewTask({
-            title: '',
-            description: '',
-            priority: 'MEDIUM',
-            status: 'TODO'
-        });
+        setNewTask({ title: '', description: '', priority: 'MEDIUM', status: 'TODO' });
+        fetchStats(); // update stats
     };
 
-    //Handle Add a new task
     const handleAddTask = async () => {
-        try {
-            //Title Validation
-            if (!newTask.title.trim()) {
-                toast.error('Please enter a task title');
-                return;
-            }
-           //console.log(user.id)
-            const payload = {
-                title: newTask.title,
-                description: newTask.description,
-                status: newTask.status,
-                priority: newTask.priority,
-                user_id: user.id
-            };
+        if (!newTask.title.trim()) {
+            toast.error('Please enter a task title');
+            return;
+        }
 
+        try {
+            const payload = { ...newTask, user_id: user.id };
             const response = await addTaskApi(payload);
 
             if (response?.success) {
-                const createdTask = response.data;
-
-                // Update state
-                setTasks((prev) => [...prev, createdTask]);
-
-                // Reset form
-                setNewTask({
-                    title: '',
-                    description: '',
-                    priority: 'MEDIUM',
-                    status: 'TODO'
-                });
-
+                setTasks(prev => [...prev, response.data]);
+                setNewTask({ title: '', description: '', priority: 'MEDIUM', status: 'TODO' });
                 setShowModal(false);
-
-                // Success toast
                 toast.success('Task created successfully');
+                fetchStats(); // update stats after adding
             } else {
                 toast.error(response?.message || 'Failed to create task');
             }
         } catch (error) {
             console.error('Add Task Error:', error);
-
-            const message =
-                error?.response?.data?.message ||
-                error.message ||
-                'Something went wrong while creating task';
-
-            toast.error(message);
+            toast.error(error?.response?.data?.message || error.message || 'Something went wrong');
         }
     };
 
+    // Pagination component
+    const renderPagination = () => {
+        if (totalPages <= 1) return null;
 
+        const pages = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pages.push(
+                <button
+                    key={i}
+                    className={`btn-pagination ${i === page ? 'btn-pagination-active' : ''}`}
+                    onClick={() => fetchTasks(i)}
+                >
+                    {i}
+                </button>
+            );
+        }
+
+        return (
+            <div className="pagination-container mt-3 d-flex gap-2 justify-content-center align-items-center">
+                {/* Previous Button */}
+                <button
+                    className="btn-orange-theme"
+                    disabled={page === 1}
+                    onClick={() => fetchTasks(page - 1)}
+                >
+                    Previous
+                </button>
+
+                {/* Page Numbers */}
+                <div className="d-flex gap-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <button
+                            key={p}
+                            className={`btn-gray-theme ${p === page ? 'active-page' : ''}`}
+                            onClick={() => fetchTasks(p)}
+                        >
+                            {p}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Next Button */}
+                <button
+                    className="btn-orange-theme"
+                    disabled={page === totalPages}
+                    onClick={() => fetchTasks(page + 1)}
+                >
+                    Next
+                </button>
+            </div>
+
+        );
+    };
 
     return (
-        <DashboardLayout userName={userName} onLogout={handleLogout}>
-
+        <DashboardLayout userName={user?.name} onLogout={handleLogout}>
             {/* Header */}
             <div className="home-header mt-3">
                 <div className="header-content">
                     <h3 className="header-title">DASHBOARD</h3>
                     <p className="header-subtitle text-muted">Manage your tasks efficiently</p>
                 </div>
-                <button className="btn-theme" onClick={() => setShowModal(true)}>
-                    + New Task
-                </button>
+                <button className="btn-theme" onClick={() => setShowModal(true)}>+ New Task</button>
             </div>
+
+            {/* Stats */}
             <div className="row mb-4 mt-5">
                 <div className="col-md-2"><StatCard label="Total Tasks" value={stats.total} /></div>
                 <div className="col-md-2"><StatCard label="To Do" value={stats.todo} /></div>
                 <div className="col-md-2"><StatCard label="In Progress" value={stats.inProgress} /></div>
                 <div className="col-md-2"><StatCard label="Completed" value={stats.done} /></div>
-                <div className="col-md-3"><StatCard label="Completion Rate" value={`${completionRate}%`} extra={completionRate>=80 ? 'Great!' : 'Keep Going'} /></div>
+                <div className="col-md-3"><StatCard label="Completion Rate" value={`${completionRate}%`} extra={completionRate >= 80 ? 'Great!' : 'Keep Going'} /></div>
             </div>
 
             {/* Tabs */}
             <div className="tasks-section card border-0 shadow-lg">
-                <div className="card-body  p-4">
-                    {/* Tab Buttons */}
+                <div className="card-body p-4">
                     <div className="tabs-container mb-4">
                         {['all', 'TODO', 'IN_PROGRESS', 'DONE'].map(tab => (
                             <button
@@ -178,17 +230,15 @@ const DashboardPage = ({user,setUser}) => {
                                 className={`tab-btn ${activeTab === tab ? 'tab-btn-active' : ''}`}
                                 onClick={() => setActiveTab(tab)}
                             >
-                                {tab === 'all'
-                                    ? 'All Tasks'
-                                    : tab === 'TODO'
-                                        ? 'To Do'
-                                        : tab === 'IN_PROGRESS'
-                                            ? 'In Progress'
-                                            : 'Completed'}
+                                {tab === 'all' ? 'All Tasks' :
+                                    tab === 'TODO' ? 'To Do' :
+                                        tab === 'IN_PROGRESS' ? 'In Progress' :
+                                            'Completed'}
                             </button>
                         ))}
                     </div>
-                    {/* Search & Filter Component */}
+
+                    {/* Search & Priority Filter */}
                     <SearchTask
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
@@ -198,32 +248,32 @@ const DashboardPage = ({user,setUser}) => {
 
                     {/* Task List */}
                     <div className="task-list">
-                        {filteredTasks.length === 0 ? (
+                        {tasks.length === 0 ? (
                             <div className="text-center">
                                 <div className="mt-2 mb-3"><ImFileEmpty size={24} /></div>
                                 <h4 className="empty-title text-theme-green">No tasks found</h4>
                                 <p className="empty-text text-muted">
-                                    {tasks.length === 0
-                                        ? 'Create your first task to get started!'
-                                        : 'Try adjusting your search or filters'}
+                                    Create your first task or adjust filters.
                                 </p>
                             </div>
                         ) : (
-                            filteredTasks.map(task => (
-                                <div key={task.id} className="task-item">
-                                    <TaskCard
-                                        task={task}
-                                        onDelete={handleDeleteTask}
-                                        onEdit={handleEditClick}
-                                    />
-
-                                </div>
+                            tasks.map(task => (
+                                <TaskCard
+                                    key={task.id}
+                                    task={task}
+                                    onDelete={handleDeleteTask}
+                                    onEdit={handleEditClick}
+                                />
                             ))
                         )}
                     </div>
+
+                    {/* Pagination */}
+                    {renderPagination()}
                 </div>
             </div>
 
+            {/* Task Modal */}
             <TaskModal
                 show={showModal}
                 newTask={newTask}
@@ -236,7 +286,6 @@ const DashboardPage = ({user,setUser}) => {
                     setModalMode("create");
                 }}
             />
-
         </DashboardLayout>
     );
 };
