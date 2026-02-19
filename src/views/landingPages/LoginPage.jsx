@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {loginApi} from '../../services/authService.js'
 import { toast } from 'react-toastify';
 
-const LoginPage = ({ setUser }) => {
+const LoginPage = ({setUser}) => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -70,7 +70,8 @@ const LoginPage = ({ setUser }) => {
             toast.success('Login Successful!');
 
             // After successful login
-            setUser(response.user);
+            setUser(response.data.user);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             localStorage.setItem('token', response.token);
             navigate('/dashboard');
 

@@ -13,7 +13,7 @@ const AuthLayout = () => {
     ];
 
     return (
-        <Container fluid className="min-vh-100 container-theme px-3 px-md-5">
+        <Container fluid className="min-vh-100 bg-theme-green px-3 px-md-5">
             <Row>
                 {/* Left side */}
                 <Col

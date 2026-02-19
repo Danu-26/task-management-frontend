@@ -1,3 +1,16 @@
+
+:root {
+    --primary-green: rgba(0, 26, 0, 0.65);
+    --accent-orange: #ff6b35;
+    --light-orange: #ff8c42;
+    --white: #ffffff;
+    --text-dark: #1f2937;
+    --bg-gray-dark: rgba(98, 100, 106, 0.63);
+    --bg-light: rgba(98, 100, 106, 0.12);
+    --border-light: rgba(0, 0, 0, 0.08);
+}
+
+
 html,
 body {
     height: auto;
@@ -13,10 +26,83 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-.container-theme {
-    background-color: #001A00;
+/* Background utilities */
+.bg-theme-green {
+    background-color: var(--primary-green) !important;
 }
 
+.bg-theme-orange {
+    background-color: var(--accent-orange) !important;
+}
+/* text theme */
+.text-theme-green {
+   color: var(--primary-green) !important;
+}
+
+/* card border theme */
+.border-theme-green {
+    border: 2px solid var(--bg-light);
+    transition: all 0.3s ease;
+}
+
+.border-theme-green:hover {
+    border: 2px solid var(--primary-green);
+}
+
+/* Gradient Button */
+.btn-theme {
+    background: linear-gradient(135deg, var(--accent-orange) 0%, var(--primary-green) 100%);
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.btn-theme:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+}
+
+.btn-orange-theme {
+    background:  var(--accent-orange);
+    border: none;
+    padding: 10px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.btn-orange-theme:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+    background:  var(--light-orange);
+}
+
+.btn-gray-theme {
+    background:  var(--bg-gray-dark);
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.btn-gray-theme:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+    background:  var(--bg-light);
+}
+
+/* Theme card */
+.card-theme {
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
 
 /*login form card*/
 .auth-form-wrapper {
@@ -127,6 +213,126 @@ body {
 .form-control:focus {
     border: none;
     box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.43) !important;
+}
+
+
+/*navbar style*/
+.navbar-theme {
+    background-color: var(--white);
+    border-bottom: 2px solid var(--primary-green);
+}
+
+/*dashboard logo*/
+.logo-theme {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--accent-orange);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Avatar circle */
+.avatar-theme {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--accent-orange);
+    color: var(--white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/*task tab section*/
+.tabs-container{
+    background-color: var(--bg-light);
+    padding-left:8px;
+    padding-top: 8px;
+    padding-right:8px;
+}
+
+.tab-btn {
+    padding: 10px 16px ;
+    margin-left:  16px;
+    background: transparent;
+    border: none;
+    gap: 30px;
+    cursor: pointer;
+    transition: border-bottom 0.3s ease;
+    font-weight: 500;
+    outline: none !important;
+}
+
+.tab-btn:hover {
+    border-bottom: 3px solid var(--primary-green);
+}
+
+.tab-btn-active {
+    border-bottom: 3px solid var(--primary-green);
+    font-weight: 600;
+    outline: none;
+}
+
+/* TaskModal*/
+
+/* Overlay behind modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Modal box */
+.modal-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+/* Close button */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 
