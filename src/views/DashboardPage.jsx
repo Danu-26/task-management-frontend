@@ -164,23 +164,39 @@ const DashboardPage = ({ user, setUser }) => {
         }
 
         return (
-            <div className="pagination-container mt-3 d-flex gap-2 justify-content-center">
+            <div className="pagination-container mt-3 d-flex gap-2 justify-content-center align-items-center">
+                {/* Previous Button */}
                 <button
-                    className="btn-pagination"
+                    className="btn-orange-theme"
                     disabled={page === 1}
                     onClick={() => fetchTasks(page - 1)}
                 >
                     Previous
                 </button>
-                {pages}
+
+                {/* Page Numbers */}
+                <div className="d-flex gap-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <button
+                            key={p}
+                            className={`btn-gray-theme ${p === page ? 'active-page' : ''}`}
+                            onClick={() => fetchTasks(p)}
+                        >
+                            {p}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Next Button */}
                 <button
-                    className="btn-pagination"
+                    className="btn-orange-theme"
                     disabled={page === totalPages}
                     onClick={() => fetchTasks(page + 1)}
                 >
                     Next
                 </button>
             </div>
+
         );
     };
 

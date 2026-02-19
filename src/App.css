@@ -70,6 +70,7 @@ body {
     border: none;
     padding: 10px;
     font-weight: 600;
+    min-width: 90px;
     border-radius: 10px;
     color: var(--white);
     transition: all 0.3s ease;
@@ -84,7 +85,7 @@ body {
 .btn-gray-theme {
     background:  var(--bg-gray-dark);
     border: none;
-    padding: 10px 20px;
+    padding: 10px 30px;
     font-weight: 600;
     border-radius: 10px;
     color: var(--white);
@@ -93,6 +94,7 @@ body {
 
 .btn-gray-theme:hover {
     transform: translateY(-1px);
+    color: var(--primary-green);
     opacity: 0.95;
     background:  var(--bg-light);
 }
