@@ -34,6 +34,15 @@ export const taskDeleteApi = async (id) => {
         const response = await axiosInstance.delete(`/task/remove-task/${id}`);
         return response.data;
     } catch (error) {
-        throw error.response?.data?.message || 'Getting task stats failed.';
+        throw error.response?.data?.message || 'Deleting task failed.';
+    }
+}
+
+export const taskUpdateApi = async (id,updatedData) => {
+    try {
+        const response = await axiosInstance.put(`/task/update-task/${id}`,updatedData);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Task updating failed.';
     }
 }
