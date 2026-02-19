@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import TaskModal from "../components/TaskModal.jsx";
 import { ImFileEmpty } from "react-icons/im";
 import SearchTask from "../components/SearchTask.jsx";
-import { addTaskApi, getTasksApi, getStatsApi ,taskDeleteApi} from "../services/taskService.js";
+import { addTaskApi, getTasksApi, getStatsApi ,taskDeleteApi,taskUpdateApi} from "../services/taskService.js";
 import { toast } from 'react-toastify';
 
 const DashboardPage = ({ user, setUser }) => {
@@ -84,7 +84,7 @@ const DashboardPage = ({ user, setUser }) => {
         fetchTasks(1);
     }, []);
 
-    // Re-fetch tasks on filters change
+    // Fetch tasks on filters change
     useEffect(() => {
         fetchTasks(1);
     }, [activeTab, priorityFilter, searchTerm]);
@@ -126,16 +126,50 @@ const DashboardPage = ({ user, setUser }) => {
         setShowModal(true);
     };
 
-    const handleUpdateTask = () => {
-        setTasks(prev => prev.map(task =>
-            task.id === editTaskId ? { ...task, ...newTask } : task
-        ));
-        setShowModal(false);
-        setEditTaskId(null);
-        setModalMode("create");
-        setNewTask({ title: '', description: '', priority: 'MEDIUM', status: 'TODO' });
-        fetchStats(); // update stats
+    //task update handler
+    const handleUpdateTask = async () => {
+        if (!newTask.title.trim()) {
+            toast.error('Please enter a task title');
+            return;
+        }
+
+        try {
+            //without user id
+            const payload = {
+                title: newTask.title,
+                description: newTask.description,
+                status: newTask.status,
+                priority: newTask.priority
+            };
+            const response = await taskUpdateApi(editTaskId, payload);
+
+            if (response?.success) {
+                // Update tasks
+                setTasks(prev =>
+                    prev.map(task =>
+                        task.id === editTaskId ? { ...task, ...response.data } : task
+                    )
+                );
+
+                // Reset modal
+                setShowModal(false);
+                setEditTaskId(null);
+                setModalMode("create");
+                setNewTask({ title: '', description: '', priority: 'MEDIUM', status: 'TODO' });
+
+                // Update stats
+                fetchStats();
+
+                toast.success('Task updated successfully');
+            } else {
+                toast.error(response?.message || 'Failed to update task');
+            }
+        } catch (error) {
+            console.error('Update Task Error:', error);
+            toast.error(error || 'Something went wrong while updating the task');
+        }
     };
+
 
     const handleAddTask = async () => {
         if (!newTask.title.trim()) {
